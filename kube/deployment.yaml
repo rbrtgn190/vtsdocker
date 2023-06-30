@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vts-deployment
+  labels:
+    app: vts
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vts
+  template:
+    metadata:
+      labels:
+        app: vts
+    spec:
+      containers:
+      - name: vts
+        image: vtsjg:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 4000
+          hostPort: 4000
+        - containerPort: 8888
+          hostPort: 8888
+        volumeMounts:
+        - mountPath: /opt/MF/MF_VTS/web/
+          name: vtsweb
+        - mountPath: /var/lib/MF/MF_VTS/db/data
+          name: db
+        - mountPath: /tmp/VTS
+          name: logs
+      volumes:
+        - name: vtsweb
+          persistentVolumeClaim:
+             claimName: vtsweb-pv-claim
+        - name: db
+          persistentVolumeClaim:
+             claimName: db-pv-claim
+        - name: logs
+          persistentVolumeClaim:
+             claimName: logs-pv-claim
